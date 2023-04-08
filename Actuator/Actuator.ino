@@ -1,6 +1,13 @@
+/*
+Last Update
+*   Dimas - 9 Apr - 06.30
+*       - Subscribe msg
+*       - Blink LED sesuai msg
+*       - [DEBUG] Publish msg + "go"
+*/
+
 #include "WiFi.h"
 #include <PubSubClient.h>
-
 
 // Update these with values suitable for your network.
 const char* ssid = "Dimasrifky";
