@@ -1,10 +1,10 @@
-#include <Wifi.h>
+#include "WiFi.h"
 #include <PubSubClient.h>
 
 // Update these with values suitable for your network.
 
-const char* ssid = "........";
-const char* password = "........";
+const char* ssid = "Dimasrifky";
+const char* password = "dinanfamily";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
 
 WiFiClient espClient;
@@ -69,9 +69,9 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("outTopic", "hello world");
+      client.publish("ESP32_Try_topic", "hello world");
       // ... and resubscribe
-      client.subscribe("inTopic");
+      client.subscribe("ESP32_Try_topic");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -97,13 +97,13 @@ void loop() {
   }
   client.loop();
 
-  unsigned long now = millis();
-  if (now - lastMsg > 2000) {
-    lastMsg = now;
-    ++value;
-    snprintf (msg, MSG_BUFFER_SIZE, "hello world #%ld", value);
-    Serial.print("Publish message: ");
-    Serial.println(msg);
-    client.publish("outTopic", msg);
-  }
+  // unsigned long now = millis();
+  // if (now - lastMsg > 2000) {
+  //   lastMsg = now;
+  //   ++value;
+  //   snprintf (msg, MSG_BUFFER_SIZE, "hello world #%ld", value);
+  //   Serial.print("Publish message: ");
+  //   Serial.println(msg);
+  //   client.publish("outTopic", msg);
+  // }
 }

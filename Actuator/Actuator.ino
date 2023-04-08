@@ -1,10 +1,10 @@
-#include <Wifi.h>
+#include "WiFi.h"
 #include <PubSubClient.h>
 
 // Update these with values suitable for your network.
 
-const char* ssid = "........";
-const char* password = "........";
+const char* ssid = "Dimasrifky";
+const char* password = "dinanfamily";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
 
 WiFiClient espClient;
@@ -39,9 +39,8 @@ void setup_wifi() {
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
+  Serial.print("Message arrived on topic: ");
   Serial.print(topic);
-  Serial.print("] ");
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
   }
