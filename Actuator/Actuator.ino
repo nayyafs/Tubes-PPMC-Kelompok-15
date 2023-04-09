@@ -23,17 +23,17 @@ int value = 0;
 bool messagePublished = false;
 
 
-//---------------------ENKRIPSI------------------------------
-// Define the encryption key
-char encryptionKey[] = "secret_key";
-// Encryption function using XOR operation
-void encryptMessage(char* message) {
-  int messageLength = strlen(message);
-  int keyLength = strlen(encryptionKey);
-  for (int i = 0; i < messageLength; i++) {
-    message[i] = message[i] ^ encryptionKey[i % keyLength];
-  }
-}
+// //---------------------DEKRIPSI------------------------------
+// // Define the encryption key
+// char encryptionKey[] = "secret_key";
+// // Encryption function using XOR operation
+// void encryptMessage(char* message) {
+//   int messageLength = strlen(message);
+//   int keyLength = strlen(encryptionKey);
+//   for (int i = 0; i < messageLength; i++) {
+//     message[i] = message[i] ^ encryptionKey[i % keyLength];
+//   }
+// }
 
 void setup_wifi() {
   delay(10);
@@ -75,7 +75,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off
   }
 
-  strcat(msg, " Go");
+  strcat(msg, " Received");
 
   if (!messagePublished) {
       client.publish("ESP32_Try_topic", msg);
@@ -119,10 +119,5 @@ void loop() {
     reconnect();
   }
   client.loop();
-
-  // int length = 5;
-  // for (int i = 0; i < length; i++){
-  //   client.publish("ESP32_Try_topic", &msg[i]);
-  // }
 
 }
