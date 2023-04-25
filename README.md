@@ -1,9 +1,11 @@
 # README
 
 ## Folder Utama -> Ard_Enc
-- Checker --> folder code checker utama
-- Actuator --> folder code Actuator utama
-- encrypt --> Coba2 doang
+- Ard_Enc/Checker   --> folder code checker utama
+- Ard_Enc/Actuator  --> folder code Actuator utama
+- Ard_Enc/encrypt   --> Coba2 doang
+- Checker           --> Coba2 doang
+- Actuator          --> Coba2 doang
 
 ### Cara penggunaan
 - Set up MQTT diLaptop pokonya
