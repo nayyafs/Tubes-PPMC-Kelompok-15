@@ -8,10 +8,11 @@ Last Update
 
 #include "WiFi.h"
 #include <PubSubClient.h>
+#include <stdlib.h>
 
 // Update these with values suitable for your network.
-const char* ssid = "Dimasrifky";
-const char* password = "dinanfamily";
+const char* ssid = "Wifi";
+const char* password = "12345678";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
 
 WiFiClient espClient;
@@ -22,18 +23,6 @@ char msg[MSG_BUFFER_SIZE];
 int value = 0;
 bool messagePublished = false;
 
-
-// //---------------------DEKRIPSI------------------------------
-// // Define the encryption key
-// char encryptionKey[] = "secret_key";
-// // Encryption function using XOR operation
-// void encryptMessage(char* message) {
-//   int messageLength = strlen(message);
-//   int keyLength = strlen(encryptionKey);
-//   for (int i = 0; i < messageLength; i++) {
-//     message[i] = message[i] ^ encryptionKey[i % keyLength];
-//   }
-// }
 
 void setup_wifi() {
   delay(10);
@@ -54,35 +43,6 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived on topic: ");
-  Serial.print(topic);
-  for (int i = 0; i < length; i++) {
-    msg[i] = (char)payload[i];
-    Serial.print(msg[i]);
-  }
-  Serial.println();
-
-  //--------------------Bagian Publish dan Subscribe----------------------
-
-  // Encrypt the received message
-  // encryptMessage(msg);
-
-  // Check if the message is "Nyalain LED dongs"
-  if (strcmp((char*)payload, "Enkripnibos") == 0) {
-    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on
-  } else {
-    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off
-  }
-
-  strcat(msg, " Received");
-
-  if (!messagePublished) {
-      client.publish("ESP32_Try_topic", msg);
-      messagePublished = true;
-    }
-}
-
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
@@ -94,9 +54,9 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("ESP32_Try_topic", "Actuator Online");
+      client.publish("ESP32_Insulin_Pump_topic", "Actuator Online");
       // ... and resubscribe
-      client.subscribe("ESP32_Try_topic");
+      client.subscribe("ESP32_Insulin_Pump_topic");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -107,7 +67,76 @@ void reconnect() {
   }
 }
 
+
+//---------------------------------- Terminal Rapih ----------------------------------------
+// bool ledBlinked = false;
+
+// void callback(char* topic, byte* payload, unsigned int length) {
+//   Serial.print("Message arrived on topic: ");
+//   Serial.print(topic);
+//   for (int i = 0; i < length; i++) {
+//     msg[i] = (char)payload[i];
+//     Serial.print(msg[i]);
+//   }
+//   Serial.println();
+
+//   if (ledBlinked) {
+//     // If the LED has already been blinked, do nothing
+//     return;
+//   } else if (strcmp((char*)payload, "Done") == 0) {
+//     // If the received message is "Done", reset the flag variable
+//     ledBlinked = false;
+//     digitalWrite(BUILTIN_LED, HIGH);
+//   } else {
+//     // Convert received message from char to integer
+//     int blink = atoi((char*)payload);
+    
+//     // Blink the LED as many times as the received integer
+//     for (int i = 0; i < blink; i++) {
+//       digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on
+//       delay(1000);
+//       digitalWrite(BUILTIN_LED, HIGH);   // Turn the LED off
+//       delay(1000);
+//       digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on
+//     }
+
+//     // Set the flag variable to true to indicate that the LED has been blinked
+//     ledBlinked = true;
+
+//     // Publish "Done" back to the MQTT broker
+//     client.publish("ESP32_Insulin_Pump_topic", "Done");
+//   }
+// }
+
+//------------------------------------ Works better -----------------------------------
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived on topic: ");
+  Serial.print(topic);
+  for (int i = 0; i < length; i++) {
+    msg[i] = (char)payload[i];
+    Serial.print(msg[i]);
+  }
+  Serial.println();
+
+  // Convert received message from char to integer
+  int blink = atoi((char*)payload);
+
+  // Blink the LED as many times as the received integer
+  for (int i = 0; i < blink; i++) {
+    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED off
+    delay(1000);
+    digitalWrite(BUILTIN_LED, HIGH);   // Turn the LED on
+    delay(1000);
+    digitalWrite(BUILTIN_LED, LOW);   // Turn the LED off
+  }
+
+  client.publish("ESP32_Insulin_Pump_topic", "Done");
+}
+
+//------------------------------------------------------------------------------
+
 void setup() {
+  pinMode(BUILTIN_LED, OUTPUT);
   Serial.begin(115200);
   setup_wifi();
   client.setServer(mqtt_server, 1883);
