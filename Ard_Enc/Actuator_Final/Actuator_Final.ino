@@ -457,19 +457,5 @@ void loop() {
     reconnect();
   }
   client.loop();
-
-
-
-
-
-
-  // unsigned long now = millis();
-  // if (now - lastMsg > 2000) {
-  //   lastMsg = now;
-  //   ++value;
-  //   snprintf (msg, MSG_BUFFER_SIZE, "hello world #%ld", value);
-  //   Serial.print("Publish message: ");
-  //   Serial.println(msg);
-  //   client.publish("ESP32_Insulin_Pump_topic", msg);
-  // }
 }
+
