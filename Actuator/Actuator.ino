@@ -1,9 +1,7 @@
 /*
 Last Update
-*   Dimas - 9 Apr - 06.30
-*       - Subscribe msg
-*       - Blink LED sesuai msg
-*       - [DEBUG] Publish msg + "go"
+*   Dimas - 26 Apr 2023
+*     - Berhasil blink LED sebanyak yang diinputkan 
 */
 
 #include "WiFi.h"
@@ -67,48 +65,6 @@ void reconnect() {
   }
 }
 
-
-//---------------------------------- Terminal Rapih ----------------------------------------
-// bool ledBlinked = false;
-
-// void callback(char* topic, byte* payload, unsigned int length) {
-//   Serial.print("Message arrived on topic: ");
-//   Serial.print(topic);
-//   for (int i = 0; i < length; i++) {
-//     msg[i] = (char)payload[i];
-//     Serial.print(msg[i]);
-//   }
-//   Serial.println();
-
-//   if (ledBlinked) {
-//     // If the LED has already been blinked, do nothing
-//     return;
-//   } else if (strcmp((char*)payload, "Done") == 0) {
-//     // If the received message is "Done", reset the flag variable
-//     ledBlinked = false;
-//     digitalWrite(BUILTIN_LED, HIGH);
-//   } else {
-//     // Convert received message from char to integer
-//     int blink = atoi((char*)payload);
-    
-//     // Blink the LED as many times as the received integer
-//     for (int i = 0; i < blink; i++) {
-//       digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on
-//       delay(1000);
-//       digitalWrite(BUILTIN_LED, HIGH);   // Turn the LED off
-//       delay(1000);
-//       digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on
-//     }
-
-//     // Set the flag variable to true to indicate that the LED has been blinked
-//     ledBlinked = true;
-
-//     // Publish "Done" back to the MQTT broker
-//     client.publish("ESP32_Insulin_Pump_topic", "Done");
-//   }
-// }
-
-//------------------------------------ Works better -----------------------------------
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);
@@ -150,3 +106,49 @@ void loop() {
   client.loop();
 
 }
+
+
+
+
+
+
+// ARCHIVE
+//---------------------------------- Terminal Rapih ----------------------------------------
+// bool ledBlinked = false;
+
+// void callback(char* topic, byte* payload, unsigned int length) {
+//   Serial.print("Message arrived on topic: ");
+//   Serial.print(topic);
+//   for (int i = 0; i < length; i++) {
+//     msg[i] = (char)payload[i];
+//     Serial.print(msg[i]);
+//   }
+//   Serial.println();
+
+//   if (ledBlinked) {
+//     // If the LED has already been blinked, do nothing
+//     return;
+//   } else if (strcmp((char*)payload, "Done") == 0) {
+//     // If the received message is "Done", reset the flag variable
+//     ledBlinked = false;
+//     digitalWrite(BUILTIN_LED, HIGH);
+//   } else {
+//     // Convert received message from char to integer
+//     int blink = atoi((char*)payload);
+    
+//     // Blink the LED as many times as the received integer
+//     for (int i = 0; i < blink; i++) {
+//       digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on
+//       delay(1000);
+//       digitalWrite(BUILTIN_LED, HIGH);   // Turn the LED off
+//       delay(1000);
+//       digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on
+//     }
+
+//     // Set the flag variable to true to indicate that the LED has been blinked
+//     ledBlinked = true;
+
+//     // Publish "Done" back to the MQTT broker
+//     client.publish("ESP32_Insulin_Pump_topic", "Done");
+//   }
+// }

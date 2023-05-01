@@ -381,7 +381,8 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("ESP32_Insulin_Pump_topic", "Checker Online");
+      client.publish("ESP32_Insulin_Status_topic", "Checker Online");
+      client.publish("ESP32_Insulin_Pump_topic", "");
       // ... and resubscribe
       client.subscribe("ESP32_Insulin_Checker_topic");
     } else {
