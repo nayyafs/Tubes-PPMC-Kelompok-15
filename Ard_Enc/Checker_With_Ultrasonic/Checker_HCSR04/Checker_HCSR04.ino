@@ -7,8 +7,8 @@ Last Update
 
 #include <WiFi.h>
 #include <PubSubClient.h>
-#define trigPin 5
-#define echoPin 18
+#define trigPin 18
+#define echoPin 19
 //---------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------
 // ---------------------------------- ENCRYPTION ----------------------------------
@@ -444,8 +444,30 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println(" cm");
 
     // Publish the distance as an ASCII string
-    char distance_str[10];
+    char distance_str[100];
     itoa(distance, distance_str, 10);
-    client.publish("ESP32_Insulin_Pump_topic", distance_str);
+
+    // client.publish("ESP32_Insulin_Pump_topic", distance_str);
+
+    plaintext[0] = distance_str[0];
+    Serial.print("Plaintext   : ");
+    Serial.println((char*) plaintext);
+    delay(100);
+
+    ret = crypto_aead_encrypt(ciphertext, &ciphertext_len, plaintext, strlen((char *) plaintext), ad, strlen((char *) ad), NULL, nonce, key);
+    if (ret != 0) {
+      Serial.println("Error: Encryption failed");
+      return;
+    }
+
+    // Convert the ciphertext to a string of hexadecimal characters
+    char ciphertext_str[(2 * CRYPTO_ABYTES) + 1];
+    for (int i = 0; i < ciphertext_len; i++) {
+      sprintf(ciphertext_str + (2 * i), "%02X", ciphertext[i]);
+    }
+    ciphertext_str[2 * ciphertext_len] = '\0';
+
+    // Publish the ciphertext as an ASCII string
+    client.publish("ESP32_Insulin_Pump_topic", ciphertext_str);
   }
 }
