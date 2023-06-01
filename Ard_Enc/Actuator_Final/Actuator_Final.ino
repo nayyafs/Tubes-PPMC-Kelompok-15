@@ -333,10 +333,10 @@ int ret;
 //---------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------
 // ---------------------------------- ESP32 Connect -------------------------------
-// const char* ssid = "Wifi";
-// const char* password = "12345678";
-const char* ssid = "Dimasrifky";
-const char* password = "dinanfamily";
+const char* ssid = "Wifi";
+const char* password = "12345678";
+// const char* ssid = "Dimasrifky";
+// const char* password = "dinanfamily";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
 
 WiFiClient espClient;
@@ -395,9 +395,17 @@ void reconnect() {
   }
 }
 
+
+
+unsigned long startTime;
+unsigned long endTime;
+
+
+
 void callback(char* topic, byte* payload, unsigned int length) {
   unsigned long long plaintext_len;
 
+startTime = micros();
 
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -425,6 +433,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
     return;
   }
   
+  
+  endTime = micros();
+  
+
+  
+  
   int blink = atoi((char*)plaintext);
   // Blink the LED as many times as the received integer
   for (int i = 0; i < blink; i++) {
@@ -434,7 +448,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
     delay(1000);
     digitalWrite(BUILTIN_LED, LOW);   // Turn the LED off
   }
+  
 
+  unsigned long executionTime = endTime - startTime;
+
+  // Print execution time to serial monitor
+  Serial.print("Execution time: ");
+  Serial.print(executionTime);
+  Serial.println(" ms");
+
+  // Reset the start time for the next iteration
+  // startTime = millis();
+
+  
   char statusMsg[50];
   sprintf(statusMsg, "Blinked %d times", blink);
   client.publish("ESP32_Insulin_Status_topic", statusMsg);
