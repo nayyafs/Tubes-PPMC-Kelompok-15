@@ -1,10 +1,3 @@
-/*
-Last Update
-*   Dimas - 26 Apr - 02.30
-*       - Berhasil Subscribe message dr topic ESP32_Insulin_Checker_topic
-*       - Berhasil Publish Message ke topic ESP32_Insulin_Pump_topic
-*/
-
 #include <WiFi.h>
 #include <PubSubClient.h>
 #define trigPin 4
