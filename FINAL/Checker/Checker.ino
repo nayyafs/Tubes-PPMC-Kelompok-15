@@ -1,13 +1,7 @@
-/*
-Last Update
-*   Dimas - 26 Apr - 02.30
-*       - Berhasil Subscribe message dr topic ESP32_Insulin_Checker_topic
-*       - Berhasil Publish Message ke topic ESP32_Insulin_Pump_topic
-*/
-
 #include <WiFi.h>
 #include <PubSubClient.h>
-
+#define trigPin 4
+#define echoPin 2
 //---------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------
 // ---------------------------------- ENCRYPTION ----------------------------------
@@ -333,10 +327,10 @@ int ret;
 //---------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------
 // ---------------------------------- ESP32 Connect -------------------------------
-// const char* ssid = "Wifi";
-// const char* password = "12345678";
-const char* ssid = "Dimasrifky";
-const char* password = "dinanfamily";
+const char* ssid = "Wifi";
+const char* password = "12345678";
+// const char* ssid = "Dimasrifky";
+// const char* password = "dinanfamily";
 const char* mqtt_server = "broker.mqtt-dashboard.com";
 
 WiFiClient espClient;
@@ -395,47 +389,14 @@ void reconnect() {
   }
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-  for (int i = 0; i < length; i++) {
-    msg[i] = (char)payload[i];
-    Serial.print(msg[i]);
-  }
-  Serial.println();
-
-  //--------------------Bagian Publish dan Subscribe----------------------
-  //--------------------------- ENCRYPT --------------------------
-  plaintext[0] = msg[0];
-  Serial.print("Plaintext   : ");
-  Serial.println((char*) plaintext);
-  delay(100);
-
-  ret = crypto_aead_encrypt(ciphertext, &ciphertext_len, plaintext, strlen((char *) plaintext), ad, strlen((char *) ad), NULL, nonce, key);
-  if (ret != 0) {
-    Serial.println("Error: Encryption failed");
-    return;
-  }
-
-  // Convert the ciphertext to a string of hexadecimal characters
-  char ciphertext_str[(2 * CRYPTO_ABYTES) + 1];
-  for (int i = 0; i < ciphertext_len; i++) {
-    sprintf(ciphertext_str + (2 * i), "%02X", ciphertext[i]);
-  }
-  ciphertext_str[2 * ciphertext_len] = '\0';
-
-  // Publish the ciphertext as an ASCII string
-  client.publish("ESP32_Insulin_Pump_topic", ciphertext_str);
-
-  client.publish("ESP32_Insulin_Pump_topic", "Done");
-}
 
 
 //---------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------
 // ---------------------------------- MAIN CODE -----------------------------------
 void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   Serial.begin(115200);
   setup_wifi();
@@ -448,4 +409,74 @@ void loop() {
     reconnect();
   }
   client.loop();
+}
+
+
+unsigned long startTime;
+unsigned long endTime;
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i = 0; i < length; i++) {
+    msg[i] = (char)payload[i];
+    Serial.print(msg[i]);
+  }
+  Serial.println();
+
+
+  if (strcmp(msg, "READ") == 0) {
+    // Read distance from HCSR04
+    long duration, distance;
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration = pulseIn(echoPin, HIGH);
+    distance = duration * 0.034 / 2;
+    Serial.print("Distance: ");
+    Serial.print(distance);
+    Serial.println(" cm");
+
+    // Publish the distance as an ASCII string
+    char distance_str[100];
+    itoa(distance, distance_str, 10);
+
+    // client.publish("ESP32_Insulin_Pump_topic", distance_str);
+
+    plaintext[0] = distance_str[0];
+    Serial.print("Plaintext   : ");
+    Serial.println((char*) plaintext);
+    delay(100);
+
+    unsigned long startTime = micros();
+    ret = crypto_aead_encrypt(ciphertext, &ciphertext_len, plaintext, strlen((char *) plaintext), ad, strlen((char *) ad), NULL, nonce, key);
+    if (ret != 0) {
+      Serial.println("Error: Encryption failed");
+      return;
+    }
+
+    // Convert the ciphertext to a string of hexadecimal characters
+    char ciphertext_str[(2 * CRYPTO_ABYTES) + 1];
+    for (int i = 0; i < ciphertext_len; i++) {
+      sprintf(ciphertext_str + (2 * i), "%02X", ciphertext[i]);
+    }
+    ciphertext_str[2 * ciphertext_len] = '\0';
+
+    endTime = micros();
+    // Publish the ciphertext as an ASCII string
+    client.publish("ESP32_Insulin_Pump_topic", ciphertext_str);
+    
+
+    
+    unsigned long executionTime = endTime - startTime;
+
+    // Print execution time to serial monitor
+    Serial.print("Execution time: ");
+    Serial.print(executionTime);
+    Serial.println(" ms");
+  }
+
 }
