@@ -481,9 +481,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
     unsigned long executionTime = endTime - startTime;
 
     // Print execution time to serial monitor
-    Serial.print("Execution time: ");
-    Serial.print(executionTime);
-    Serial.println(" ms");
+    // Serial.print("Execution time: ");
+    // Serial.print(executionTime);
+    // Serial.println(" ms");
+    // Serial.print("Free memory : ");
+    // Serial.println(ESP.getFreeHeap());
   }
 
 }

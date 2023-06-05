@@ -456,6 +456,8 @@ startTime = micros();
   Serial.print("Execution time: ");
   Serial.print(executionTime);
   Serial.println(" ms");
+  Serial.print("Free memory : ");
+  Serial.println(ESP.getFreeHeap());
 
   // Reset the start time for the next iteration
   // startTime = millis();
